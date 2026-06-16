@@ -1,0 +1,36 @@
+import torch
+from pycocoevalcap.cider.cider import Cider
+from pycocoevalcap.meteor.meteor import Meteor
+from src.data.flickr8k.get_loader import load, transform
+
+def evaluate(enc, dec, test_captions, itos, sample_fn, img_dir):
+    device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    enc.eval()
+    dec.eval()
+
+    predictions={}
+    with torch.no_grad():
+        for image_id in test_captions.keys():
+            image=load(image_id, img_dir)
+            image=transform(image).unsqueeze(0).to(device)
+            features=enc(image)
+            output_ids=sample_fn(features)
+            ans=""
+
+            for id in output_ids:
+                word=itos[id]
+                if word =='<start>':
+                    continue
+                elif word=='<end>':
+                    break
+                ans+=word
+                ans+=' '
+            predictions[image_id]=[ans]
+
+    meteor=Meteor()
+    meteor_score, _=meteor.compute_score(test_captions, predictions)
+
+    cider=Cider()
+    cider_score, _=cider.compute_score(test_captions, predictions)
+    return meteor_score, cider_score
