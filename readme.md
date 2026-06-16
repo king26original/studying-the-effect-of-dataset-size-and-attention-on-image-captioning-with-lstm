@@ -196,6 +196,9 @@ Increasing beam width beyond 3 did not improve performance.
 | Decoding Strategy | METEOR | CIDEr |
 |------------------|---------|--------|
 | Greedy | 0.168 | 0.231 |
+| Beam 3 | 0.168 | 0.257 |
+| Beam 5 | 0.164 | 0.255 |
+| Beam 7 | 0.162 | 0.252 |
 
 ### Observation
 
@@ -205,12 +208,19 @@ The attention-based decoder achieved a slightly higher METEOR score but did not 
 
 ## Flickr8k (No Attention)
 
+| Decoding Strategy | METEOR | CIDEr |
+|------------------|---------|--------|
+| Greedy | 0.171 | 0.255 |
+| Beam 3 | 0.169 | 0.270 |
+| Beam 5 | 0.169 | 0.277 |
+| Beam 7 | 0.168 | 0.279 |
+
 The Flickr8k model achieved higher METEOR and CIDEr scores than expected relative to Flickr30k despite being trained on a smaller dataset.
 
 This suggests that:
 
 - Flickr8k may be an easier benchmark,
-- Larger datasets do not automatically translate to better performance,
+- Larger datasets do not automatically translate to better performance when trained for the same time,
 - Model capacity and training setup may become bottlenecks on more diverse datasets.
 
 ---
@@ -227,7 +237,7 @@ However, larger beam widths produced diminishing returns.
 
 ## 2. More Data Is Not Always Better
 
-Although Flickr30k contains nearly four times more training images than Flickr8k, the larger dataset did not consistently outperform the smaller benchmark under the same architecture.
+Although Flickr30k contains nearly four times more training images than Flickr8k, the larger dataset did not consistently outperform the smaller benchmark under the same architecture and same compute.
 
 This suggests that simply increasing dataset size is insufficient without adequate model capacity and optimization.
 
@@ -237,11 +247,7 @@ This suggests that simply increasing dataset size is insufficient without adequa
 
 Contrary to expectations, the attention-based decoder failed to substantially outperform the simpler Show-and-Tell baseline.
 
-Further investigation suggested that:
-
-- Attention quality depends heavily on encoder representations,
-- Decoder initialization plays an important role,
-- Additional architectural modifications may be necessary for attention mechanisms to be effective.
+Additional architectural modifications may be necessary for attention mechanisms to be effective.
 
 ---
 
@@ -297,21 +303,13 @@ Prediction:
 
 ---
 
-# Repository Structure
+# Install Pre_trained models
 
 ```
-.
-├── notebooks/
-├── models/
-├── datasets/
-├── checkpoints/
-├── results/
-├── attention_visualizations/
-├── README.md
-└── requirements.txt
+kaggle models download -m king26legit/flickr8k-no-attention-80-epochs
+kaggle models download -m king26original/flickr30k-no-attention-80-epochs
+kaggle models download -m vanshraghuvanshi/flickr30k-attention-80-epochs
 ```
-
----
 
 # Future Work
 
@@ -319,9 +317,7 @@ Potential directions for improvement include:
 
 - Fine-tuning deeper ResNet layers,
 - Increasing encoder capacity,
-- Improved decoder initialization,
 - Better attention mechanisms,
-- Scheduled sampling,
 - Transformer-based captioning models,
 - CLIP-based vision-language architectures.
 
@@ -335,7 +331,6 @@ While the resulting models do not achieve state-of-the-art performance, the expe
 
 - Decoding strategy significantly affects caption quality.
 - Attention mechanisms are not guaranteed to improve performance.
-- Larger datasets alone do not solve captioning challenges.
-- Careful empirical analysis often reveals more insight than benchmark numbers alone.
+- Larger datasets alone do not solve captioning challenges when trained for same time as the smaller counterpart
 
 The focus of this work is therefore not on achieving the highest scores, but on understanding why these systems behave the way they do.

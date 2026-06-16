@@ -103,3 +103,62 @@ class decoder(nn.Module):
 
       inputs=self.embed(predicted)
     return output_ids
+  def beam(self,features,k,max_len=20):
+    vocab_size=self.linear.out_features
+    start_token=1
+    end_token=2
+    device=features.device
+    
+    k_prev_words=torch.full((k,1),start_token,dtype=torch.long,device=device)
+    top_k_scores=torch.zeros(k,1,device=device)
+    
+    features=features.expand(k,*features.shape[1:])
+    inputs=self.embed(k_prev_words[:,-1])
+    
+    h_state=torch.zeros(k,self.lstm.hidden_size).to(device)
+    c_state=torch.zeros(k,self.lstm.hidden_size).to(device)
+    
+    context,_=self.attention(features,h_state)
+    lstm_input=torch.cat((inputs,context),dim=1)
+    h_state,c_state=self.lstm(lstm_input,(h_state,c_state))
+    output=self.linear(h_state)
+    
+    log_probs=F.log_softmax(output,dim=1) 
+    
+    top_k_scores,top_k_words=log_probs[0].topk(k,dim=0)
+    
+    k_prev_words=top_k_words.unsqueeze(1) 
+    top_k_scores=top_k_scores.unsqueeze(1)
+    
+    for i in range(1,max_len):
+        inputs=self.embed(k_prev_words[:,-1])
+        
+        context,_=self.attention(features,h_state)
+        lstm_input=torch.cat((inputs,context),dim=1)
+        
+        h_state,c_state=self.lstm(lstm_input,(h_state,c_state))
+        output=self.linear(h_state)
+        log_probs=F.log_softmax(output,dim=1)
+
+        total_scores=top_k_scores+log_probs 
+        
+        total_scores=total_scores.view(-1)
+        top_k_scores,top_k_indices=total_scores.topk(k,dim=0)
+        
+        prev_word_indices=top_k_indices//vocab_size 
+        next_word_ids=top_k_indices%vocab_size      
+        
+        new_sequences=torch.cat(
+            [k_prev_words[prev_word_indices],next_word_ids.unsqueeze(1)],dim=1
+        )
+        k_prev_words=new_sequences
+        
+        h_state=h_state[prev_word_indices]
+        c_state=c_state[prev_word_indices]
+        
+        top_k_scores=top_k_scores.unsqueeze(1)
+        
+        if next_word_ids[0].item()==end_token:
+            break
+
+    return k_prev_words[0].tolist()
