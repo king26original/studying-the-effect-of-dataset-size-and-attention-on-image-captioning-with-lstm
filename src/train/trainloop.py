@@ -14,7 +14,7 @@ def train(encoder, decoder, train_loader, itos, stoi, att=False):
         ATTENTION_DIM=512
     
     enc=encoder(ENC_DIM).to(device)
-    dec=decoder(EMBED_SIZE,HIDDEN_SIZE,len(itos)).to(device) if att is False else decoder(embed_size=EMBED_SIZE, hidden_size=HIDDEN_SIZE, vocab_size=len(itos), encoder_dim=ENC_DIM, attention_dim=ATTENTION_DIM)
+    dec=decoder(EMBED_SIZE,HIDDEN_SIZE,len(itos)).to(device) if att is False else decoder(embed_size=EMBED_SIZE, hidden_size=HIDDEN_SIZE, vocab_size=len(itos), encoder_dim=ENC_DIM, attention_dim=ATTENTION_DIM).to(device)
 
     loss_fn=nn.CrossEntropyLoss(ignore_index=stoi["<pad>"])
     optimizer=torch.optim.Adam(list(enc.parameters())+list(dec.parameters()), lr=0.001)
