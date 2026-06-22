@@ -6,10 +6,28 @@ import torch.nn.functional as F
 class encoder(nn.Module):
   """
   my encoder uses the simple cnn based pretrained resnet 50 for 
-  getting the image information
+  getting the image information and projects to the embedding space
+
+  Attributes:
+    enc_dim: Output embedding dimension
+    resnet: Frozen ResNet50 backbone (without final FC layer)
+    linear: Linear projection layer
+    bn: Batch normalization layer
   """
   def __init__(self, enc_dim):
+    """
+    Initialize the encoder.
+        
+    Args:
+      enc_dim: Dimension of the output embedding vector.
+
+    Raises:
+      ValueError: If enc_dim is not positive
+    """
+
     super().__init__()
+    if enc_dim <= 0:
+      raise ValueError(f"enc_dim must be positive, got {enc_dim}")
 
     self.resnet=models.resnet50(pretrained=True)
     in_features=self.resnet.fc.in_features
@@ -25,11 +43,21 @@ class encoder(nn.Module):
 
   def forward(self, images):
     """
-        Args:
-            images: (batch_size, 3, 224, 224)
-        Returns:
-            features: (batch_size, embed_dim)
+    Extract features from input images.
+
+    Args:
+      images: (batch_size, 3, 224, 224)
+
+    Returns:
+      features: (batch_size, embed_dim)
+
+    Raises:
+      ValueError: If input tensor has wrong dimensions
     """
+    if images.dim() != 4:
+      raise ValueError(
+          f"Expected 4D tensor (B, C, H, W), got {images.dim()}D"
+      )
     features=self.resnet(images) # (B, 2048, 1, 1)
     features=features.view(features.size(0), -1) # (B, 2048)
     features=self.linear(features) # (B, embed_dim)
