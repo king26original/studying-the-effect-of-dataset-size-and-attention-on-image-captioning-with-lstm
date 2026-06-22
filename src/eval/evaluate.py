@@ -20,12 +20,12 @@ def evaluate(enc, dec, test_captions, itos, sample_fn, img_dir):
 
             for id in output_ids:
                 word=itos[id]
-                if word =='<start>':
+                if word in ['<start>', '<pad>', '<unk>']:
                     continue
                 elif word=='<end>':
                     break
-                ans+=word
-                ans+=' '
+                ans+=word+' '
+            ans.strip() # removes trailig space
             predictions[image_id]=[ans]
 
     meteor=Meteor()
