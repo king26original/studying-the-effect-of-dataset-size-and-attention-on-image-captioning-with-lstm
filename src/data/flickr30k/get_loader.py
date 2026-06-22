@@ -5,6 +5,9 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torch.nn.utils.rnn import pad_sequence
 
+# update this according the location
+IMG_DIR = "/path/to/flickr30k/images"
+
 #for transforming into standard size and converting from pil into tensor
 transform=transforms.Compose([
     transforms.Resize((224,224)),
@@ -34,7 +37,7 @@ def fn(batch):
   img=[]
   captions=[]
   for image_name, caption in batch:
-    img.append(load(image_name, transform=transform))
+    img.append(load(image_name, IMG_DIR, transform=transform))
     captions.append(torch.tensor(caption, dtype=torch.long))
     
   captions=pad_sequence(captions, batch_first=True, padding_value=0)  
