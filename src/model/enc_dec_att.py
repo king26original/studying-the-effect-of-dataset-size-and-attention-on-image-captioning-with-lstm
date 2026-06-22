@@ -5,8 +5,30 @@ import math
 import torch.nn.functional as F
 
 class encoder(nn.Module):
-  def __init__(self, embed_size, att=False):
+  """
+  my encoder uses the simple cnn based pretrained resnet 50 for 
+  getting the image information and projects to the embedding space
+
+  Attributes:
+    enc_dim: Output embedding dimension
+    resnet: Frozen ResNet50 backbone (without final FC layer)
+    linear: Linear projection layer
+    bn: Batch normalization layer
+  """
+  def __init__(self, enc_dim):
+    """
+    Initialize the encoder.
+        
+    Args:
+      enc_dim: Dimension of the output embedding vector.
+
+    Raises:
+      ValueError: If enc_dim is not positive
+    """
     super().__init__()
+
+    if enc_dim<=0:
+      raise ValueError(f"enc_dim must be positive, got {enc_dim}")
 
     self.resnet=models.resnet50(pretrained=True)
     in_features=self.resnet.fc.in_features
@@ -17,10 +39,26 @@ class encoder(nn.Module):
     modules=list(self.resnet.children())[:-2]
     self.resnet=nn.Sequential(*modules)
 
-    self.linear=nn.Linear(in_features, embed_size)
-    self.bn=nn.BatchNorm1d(embed_size, momentum=0.01)
+    self.linear=nn.Linear(in_features, enc_dim)
+    self.bn=nn.BatchNorm1d(enc_dim, momentum=0.01)
 
   def forward(self, images):
+    """
+    Extract features from input images.
+
+    Args:
+      images: (batch_size, 3, 224, 224)
+
+    Returns:
+      features: (batch_size, embed_dim)
+
+    Raises:
+      ValueError: If input tensor has wrong dimensions
+    """
+    if images.dim() != 4:
+      raise ValueError(
+          f"Expected 4D tensor (B, C, H, W), got {images.dim()}D"
+      )
     features=self.resnet(images)
     features=features.view(features.size(0), features.size(1), -1)
     features=features.permute(0, 2,1)
@@ -34,7 +72,30 @@ class encoder(nn.Module):
     return features
 
 class Attention(nn.Module):
+  """
+  Scaled dot-product attention mechanism.
+    
+  Computes attention weights over encoder outputs based on the
+  current decoder hidden state, then produces a context vector
+  as a weighted sum of encoder outputs.
+    
+  Implements: Attention(Q, K, V) = softmax(QK^T / sqrt(d)) * V
+    
+  Attributes:
+      Wq: Query projection
+      Wk: Key projection  
+      Wv: Value projection
+      dim: Attention dimension (for scaling)
+  """
   def __init__(self, encoder_dim, decoder_dim, attention_dim):
+    """
+    Initialize attention mechanism.
+        
+    Args:
+        encoder_dim: Dimension of encoder outputs
+        decoder_dim: Dimension of decoder hidden state
+        attention_dim: Internal attention dimension
+    """
     super().__init__()
     self.Wq=nn.Linear(decoder_dim, attention_dim)
     self.Wk=nn.Linear(encoder_dim, attention_dim)
@@ -43,15 +104,27 @@ class Attention(nn.Module):
     self.dim=attention_dim
 
   def forward(self, enc, sprev):
-    q=self.Wq(sprev)
+    """
+    Compute attention-weighted context vector.
+        
+    Args:
+        encoder_out: Encoder outputs (batch, num_pixels, encoder_dim)
+        decoder_hidden: Decoder hidden state (batch, decoder_dim)
+        
+    Returns:
+        Tuple of:
+            - context: Weighted context vector (batch, attention_dim)
+            - weights: Attention weights (batch, num_pixels)
+    """
 
-    k=self.Wk(enc)
-    v=self.Wv(enc)
+    q=self.Wq(sprev)# (B, attention_dim)
+    k=self.Wk(enc)# (B, N, attention_dim)
+    v=self.Wv(enc)# (B, N, attention_dim)
 
-    att=torch.bmm(q.unsqueeze(1), k.transpose(1,2))/math.sqrt(self.dim)
-    att=torch.softmax(att, dim=2)
+    att=torch.bmm(q.unsqueeze(1), k.transpose(1,2))/math.sqrt(self.dim)# (B, 1, N)
+    att=torch.softmax(att, dim=2)# (B, 1, N)
 
-    context=torch.bmm(att, v).squeeze(1)
+    context=torch.bmm(att, v).squeeze(1) # (B, attention_dim)
     return context, att.squeeze(1)
 
 class decoder(nn.Module):
