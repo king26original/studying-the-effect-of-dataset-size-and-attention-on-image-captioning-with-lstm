@@ -4,6 +4,30 @@ from torch.nn.modules import loss
 import torch.nn as nn
 
 def train(encoder, decoder, train_loader, itos, stoi, att=False):
+    """
+    Train the image captioning model.
+    
+    Args:
+        encoder_class: Encoder class (not instance)
+        decoder_class: Decoder class (not instance)
+        train_loader: DataLoader for training data
+        itos: Index to string vocabulary mapping
+        stoi: String to index vocabulary mapping
+        att: Whether to use attention mechanism (default: False)
+        config: Optional configuration dictionary with:
+            - enc_dim: Encoder dimension (default: 256)
+            - embed_size: Embedding size (default: 256)
+            - hidden_size: LSTM hidden size (default: 512)
+            - attention_dim: Attention dimension (default: 512)
+            - num_epochs: Number of epochs (default: 80)
+            - learning_rate: Learning rate (default: 0.001)
+    
+    Returns:
+        Tuple containing:
+            - losses: List of epoch losses
+            - encoder: Trained encoder model
+            - decoder: Trained decoder model
+    """
     device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     ENC_DIM=256
