@@ -4,6 +4,21 @@ from pycocoevalcap.meteor.meteor import Meteor
 from src.data.flickr8k.get_loader import load, transform
 
 def evaluate(enc, dec, test_captions, itos, sample_fn, img_dir):
+    """
+    Evaluate model using METEOR and CIDEr metrics.
+    
+    Args:
+        encoder: Trained encoder model
+        decoder: Trained decoder model
+        test_captions: Dictionary mapping image IDs to list of reference captions
+        itos: Index to string vocabulary mapping
+        sample_fn: Decoding function (e.g., decoder.sample or decoder.beam)
+        img_dir: Directory containing test images
+    
+    Returns:
+        Tuple of (METEOR score, CIDEr score)
+    
+    """
     device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     enc.eval()
