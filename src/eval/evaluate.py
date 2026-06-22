@@ -25,7 +25,7 @@ def evaluate(enc, dec, test_captions, itos, sample_fn, img_dir):
                 elif word=='<end>':
                     break
                 ans+=word+' '
-            ans.strip() # removes trailig space
+            ans=ans.strip() # removes trailig space
             predictions[image_id]=[ans]
 
     meteor=Meteor()
