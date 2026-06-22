@@ -4,6 +4,9 @@ import os
 import torch
 from src.data.flickr8k.tokenize import data
 
+# change this to the actual path of the dataset
+IMG_DIR = "/path/to/flickr8k/images"
+
 #for transforming into standard size and converting from pil into tensor
 transform=transforms.Compose([
     transforms.Resize((224,224)),
@@ -22,7 +25,7 @@ def fn(batch):
   img=[]
   captions=[]
   for image_name, caption in batch:
-    img.append(load(image_name, transform=transform))
+    img.append(load(image_name, IMG_DIR, transform=transform))
     captions.append(torch.tensor(caption, dtype=torch.long))
 
   captions=torch.stack(captions)
