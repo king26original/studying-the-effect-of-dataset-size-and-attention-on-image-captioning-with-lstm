@@ -39,7 +39,12 @@ def train(encoder, decoder, train_loader, itos, stoi, att=False):
             with torch.cuda.amp.autocast():
                 features=enc(images)
                 output=dec(features,captions)
-                loss=loss_fn(output.view(-1, len(itos)), captions.view(-1))
+                if att:
+                    targets = captions[:, 1:]
+                else:
+                    targets = captions
+
+                loss=loss_fn(output.view(-1, len(itos)), targets.view(-1))
 
             scaler.scale(loss).backward()
             scaler.step(optimizer)
