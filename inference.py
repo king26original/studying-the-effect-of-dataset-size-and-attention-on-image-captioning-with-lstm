@@ -4,8 +4,12 @@ from PIL import Image
 from torchvision import transforms
 from huggingface_hub import hf_hub_download
 from src.model.enc_dec_att import encoder, decoder
-from src.train.trainloop import ENC_DIM, EMBED_SIZE, HIDDEN_SIZE, ATTENTION_DIM
 from src.data.flickr8k.get_loader import transform
+
+ENC_DIM=256
+EMBED_SIZE=256
+HIDDEN_SIZE=512
+ATTENTION_DIM=512
 
 # ── HuggingFace repo ─────────────────────────────────────────────────────────
 # Replace with your actual HuggingFace username/repo-name
