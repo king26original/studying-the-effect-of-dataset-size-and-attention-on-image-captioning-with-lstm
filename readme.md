@@ -29,6 +29,10 @@ The goal of this project was to understand:
 
 ---
 
+Models deployed on streamlit - https://image-captioning-lstm-king.streamlit.app/
+
+---
+
 # Architectures
 
 ## 1. Show-and-Tell (No Attention)
