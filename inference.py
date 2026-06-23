@@ -30,7 +30,7 @@ def download_models():
     decoder_no_attention_flickr30k_path = hf_hub_download(repo_id=HF_REPO_ID, filename="dec-no-lstm-attention-flckr30k.pth")
     encoder_no_attention_flickr8k_path = hf_hub_download(repo_id=HF_REPO_ID, filename="enc-no-lstm-attention-flckr8k.pth")
     decoder_no_attention_flickr8k_path = hf_hub_download(repo_id=HF_REPO_ID, filename="dec-no-lstm-attention-flckr8k.pth")
-    vocab30k_path   = hf_hub_download(repo_id=HF_REPO_ID, filename="vocab30k.pkl")
+    vocab30k_path   = hf_hub_download(repo_id=HF_REPO_ID, filename="vocab30k_attention.pkl")
     vocab8k_path   = hf_hub_download(repo_id=HF_REPO_ID, filename="vocab8k.pkl")
     return encoder_attention_flickr30k_path, decoder_attention_flickr30k_path, encoder_no_attention_flickr30k_path, decoder_no_attention_flickr30k_path, encoder_no_attention_flickr8k_path, decoder_no_attention_flickr8k_path, vocab30k_path, vocab8k_path
 
