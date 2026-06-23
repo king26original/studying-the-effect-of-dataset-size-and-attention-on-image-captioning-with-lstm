@@ -7,3 +7,6 @@ spacy>=3.5.0
 tqdm>=4.65.0
 matplotlib>=3.7.0
 pycocoevalcap>=1.2
+streamlit
+Pillow
+huggingface_hub
