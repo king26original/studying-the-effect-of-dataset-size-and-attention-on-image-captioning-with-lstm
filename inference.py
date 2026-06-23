@@ -49,7 +49,7 @@ def load_vocab(vocab_path):
     return vocab["itos"], vocab["stoi"]
 
 
-def load_models(encoder_path, decoder_path, encoder, decoder, vocab_size, device):
+def load_models(encoder_path, decoder_path, encoder, decoder, vocab_size, device, att=True):
     """
     Reconstruct encoder and decoder with the same architecture used
     during training, then load the saved weights.
@@ -70,13 +70,19 @@ def load_models(encoder_path, decoder_path, encoder, decoder, vocab_size, device
     enc.eval()  # switches BatchNorm to use running stats, not batch stats
 
     # Build decoder with same hyperparams as training
-    dec = decoder(
-        embed_size    = EMBED_SIZE,
-        hidden_size   = HIDDEN_SIZE,
-        vocab_size    = vocab_size,
-        encoder_dim   = ENC_DIM,
-        attention_dim = ATTENTION_DIM,
-    )
+    if att is True:
+        dec = decoder(
+            embed_size    = EMBED_SIZE,
+            hidden_size   = HIDDEN_SIZE,
+            vocab_size    = vocab_size,
+            attention_dim = ATTENTION_DIM,
+        )
+    else:
+        dec = decoder(
+            embed_size    = EMBED_SIZE,
+            hidden_size   = HIDDEN_SIZE,
+            vocab_size    = vocab_size,
+        )
     dec.load_state_dict(torch.load(decoder_path, map_location=device))
     dec.to(device)
     dec.eval()

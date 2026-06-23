@@ -29,8 +29,8 @@ def load_pipeline():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     enc_30k_att, dec_30k_att = load_models(encoder_attention_flickr30k_path, decoder_attention_flickr30k_path, encoder_att, decoder_att, len(itos_30k), device)
-    enc_30k_no_att, dec_30k_no_att = load_models(encoder_no_attention_flickr30k_path, decoder_no_attention_flickr30k_path,encoder, decoder, len(itos_30k), device)
-    enc_8k_no_att, dec_8k_no_att = load_models(encoder_no_attention_flickr8k_path, decoder_no_attention_flickr8k_path,encoder, decoder, len(itos_8k), device)
+    enc_30k_no_att, dec_30k_no_att = load_models(encoder_no_attention_flickr30k_path, decoder_no_attention_flickr30k_path,encoder, decoder, len(itos_30k), device, att=False)
+    enc_8k_no_att, dec_8k_no_att = load_models(encoder_no_attention_flickr8k_path, decoder_no_attention_flickr8k_path,encoder, decoder, len(itos_8k), device, att=False)
 
     return enc_30k_att, dec_30k_att, enc_30k_no_att, dec_30k_no_att, enc_8k_no_att, dec_8k_no_att, itos_30k, itos_8k
 
