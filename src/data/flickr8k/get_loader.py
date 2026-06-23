@@ -2,7 +2,6 @@ from torchvision import transforms
 from PIL import Image
 import os
 import torch
-from src.data.flickr8k.tokenize import data
 
 # change this to the actual path of the dataset
 IMG_DIR = "/path/to/flickr8k/images"
@@ -33,4 +32,6 @@ def fn(batch):
 
 from torch.utils.data import Dataset, DataLoader
 
-train_loader=DataLoader(data, batch_size=32, shuffle=True, collate_fn=fn)
+def get_loader(data):
+  train_loader=DataLoader(data, batch_size=32, shuffle=True, collate_fn=fn)
+  return train_loader
