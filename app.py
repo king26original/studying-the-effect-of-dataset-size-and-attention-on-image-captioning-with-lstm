@@ -1,6 +1,8 @@
 import streamlit as st
 import torch
 from PIL import Image
+from src.model.enc_dec import encoder, decoder
+from src.model.enc_dec_att import encoder_att, decoder_att
 from inference import download_models, load_vocab, load_models, generate_caption
 
 # ── Page config ───────────────────────────────────────────────────────────────
@@ -26,9 +28,9 @@ def load_pipeline():
     itos_8k, stoi_8k = load_vocab(vocab8k_path)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    enc_30k_att, dec_30k_att = load_models(encoder_attention_flickr30k_path, decoder_attention_flickr30k_path, len(itos_30k), device)
-    enc_30k_no_att, dec_30k_no_att = load_models(encoder_no_attention_flickr30k_path, decoder_no_attention_flickr30k_path, len(itos_30k), device)
-    enc_8k_no_att, dec_8k_no_att = load_models(encoder_no_attention_flickr8k_path, decoder_no_attention_flickr8k_path, len(itos_8k), device)
+    enc_30k_att, dec_30k_att = load_models(encoder_attention_flickr30k_path, decoder_attention_flickr30k_path, encoder_att, decoder_att, len(itos_30k), device)
+    enc_30k_no_att, dec_30k_no_att = load_models(encoder_no_attention_flickr30k_path, decoder_no_attention_flickr30k_path,encoder, decoder, len(itos_30k), device)
+    enc_8k_no_att, dec_8k_no_att = load_models(encoder_no_attention_flickr8k_path, decoder_no_attention_flickr8k_path,encoder, decoder, len(itos_8k), device)
 
     return enc_30k_att, dec_30k_att, enc_30k_no_att, dec_30k_no_att, enc_8k_no_att, dec_8k_no_att, itos_30k, itos_8k
 

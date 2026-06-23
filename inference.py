@@ -3,7 +3,6 @@ import pickle
 from PIL import Image
 from torchvision import transforms
 from huggingface_hub import hf_hub_download
-from src.model.enc_dec_att import encoder, decoder
 from src.data.flickr8k.get_loader import transform
 
 ENC_DIM=256
@@ -50,7 +49,7 @@ def load_vocab(vocab_path):
     return vocab["itos"], vocab["stoi"]
 
 
-def load_models(encoder_path, decoder_path, vocab_size, device):
+def load_models(encoder_path, decoder_path, encoder, decoder, vocab_size, device):
     """
     Reconstruct encoder and decoder with the same architecture used
     during training, then load the saved weights.
