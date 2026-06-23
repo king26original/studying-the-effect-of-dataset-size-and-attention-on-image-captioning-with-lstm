@@ -141,7 +141,7 @@ class decoder(nn.Module):
     lstm: LSTM recurrent layer
     linear: Output projection to vocabulary
   """
-  def __init__(self,embed_size,hidden_size,vocab_size, encoder_dim, attention_dim, num_layers=1):
+  def __init__(self,embed_size,hidden_size,vocab_size, encoder_dim, attention_dim):
     """
     Initialize the decoder.
 
@@ -149,18 +149,17 @@ class decoder(nn.Module):
       embed_size: Dimension of word embeddings
       hidden_size: Dimension of LSTM hidden states
       vocab_size: Number of words in vocabulary
-      num_layers: Number of LSTM layers (default: 1)
     
     Raises:
       ValueError: If any dimension is not positive
     """
     super().__init__()
 
-    if embed_size <= 0 or hidden_size <= 0 or vocab_size <= 0 or num_layers<=0 or attention_dim<=0:
+    if embed_size <= 0 or hidden_size <= 0 or vocab_size <= 0 or attention_dim<=0:
       raise ValueError("All dimensions must be positive")
     
     self.embed=nn.Embedding(vocab_size,embed_size)
-    self.attention=Attention(encoder_dim, hidden_size, num_layers, attention_dim)
+    self.attention=Attention(encoder_dim, hidden_size, attention_dim)
     self.lstm=nn.LSTMCell(embed_size+attention_dim, hidden_size)
     self.linear=nn.Linear(hidden_size,vocab_size)
 
