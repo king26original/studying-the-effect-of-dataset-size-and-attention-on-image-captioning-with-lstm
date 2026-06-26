@@ -26,7 +26,8 @@ class encoder(nn.Module):
     """
 
     super().__init__()
-    if enc_dim <= 0:
+
+    if enc_dim<=0:
       raise ValueError(f"enc_dim must be positive, got {enc_dim}")
 
     self.resnet=models.resnet50(pretrained=True)
@@ -91,8 +92,8 @@ class decoder(nn.Module):
       ValueError: If any dimension is not positive
     """
     super().__init__()
-    
-    if embed_size <= 0 or hidden_size <= 0 or vocab_size <= 0:
+
+    if embed_size <= 0 or hidden_size <= 0 or vocab_size <= 0 or num_layers<=0:
       raise ValueError("All dimensions must be positive")
 
     self.embed=nn.Embedding(vocab_size,embed_size)

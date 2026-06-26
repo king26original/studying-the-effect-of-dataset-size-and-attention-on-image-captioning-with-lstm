@@ -1,4 +1,3 @@
-import random
 from src.data.flickr8k.download_flickr8k import download
 
 def get_captions(train_file, test_file, caption_file):
