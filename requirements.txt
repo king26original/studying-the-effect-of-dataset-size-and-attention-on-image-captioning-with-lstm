@@ -10,3 +10,4 @@ pycocoevalcap>=1.2
 streamlit
 Pillow
 huggingface_hub
+sqlalchemy
